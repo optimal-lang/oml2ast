@@ -97,11 +97,7 @@ function read_sexp(code, exp) {
     token = token.replaceAll("\r\n", "\n");
     token = token.replace(/(^#@|@$)/g, "");
     token = token.replace(/(@@)/g, "@");
-    token = token.replace(/(`)/g, "\\`");
-    token = token.replace(/({{)/g, "${");
-    token = token.replace(/(}})/g, "}");
-    token = "`" + token + "`";
-    return ["@", token];
+    return ["#@", token];
   default: {
     if (token[0] === ":") return token;
     if (token[0] === "&") return token;
