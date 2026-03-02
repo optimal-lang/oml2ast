@@ -1,5 +1,5 @@
 function tokenize(str) {
-  let re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|@(?:@@|[^@])*@|#@(?:@@|[^@])*@|;.*|#[!# ].*|#lang[ ]+.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
+  let re = /[\s,]*([()\[\]{}'`]|[$]?"(?:\\.|[^\\"])*"|@(?:@@|[^@])*@|#@(?:@@|[^@])*@|;.*|#[!# ].*|#lang[ ]+.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
   let result = [];
   let token;
   while ((token = re.exec(str)[1]) !== "") {
@@ -67,7 +67,10 @@ function read_sexp(code, exp) {
     return ["@", "undefined"];
   }
   let ch = token[0];
-  if (ch == "#") ch = token.slice(0, 2);
+    if (ch == "#") ch = token.slice(0, 2);
+    if (token.startsWith('$"')) {
+        ch = '$"';
+    }
   switch (ch) {
   case "(":
   case "[":
@@ -85,6 +88,10 @@ function read_sexp(code, exp) {
     token = token.replaceAll("\n", "\\n");
     token = JSON.parse(token);
     return token;
+  case '$"':
+    token = token.replaceAll("\r\n", "\n");
+      token = token.replace(/(^[$]"|"$)/g, "");
+      return ["#@", token];
   case "@":
     token = token.replace(/(^@|@$)/g, "");
     token = token.replace(/(@@)/g, "@");
