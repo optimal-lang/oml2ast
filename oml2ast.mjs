@@ -91,11 +91,13 @@ function read_sexp(code, exp) {
     token = token.trim();
     return ["@", token];
   case "#|":
-    token = token.replace(/^#[\|]/g, "");
-    token = token.replace(/[\|]#$/g, "");
-    token = token.trim();
-    return ["@", token];
-  case "#@":
+    if (token.startsWith("#|@")) {
+      token = token.replace(/^#[\|]@/g, "");
+      token = token.replace(/[\|]#$/g, "");
+      token = token.trim();
+      return ["@", token];
+    }
+  case "#@": // template literal string
     token = token.replaceAll("\r\n", "\n");
     token = token.replace(/(^#@|@$)/g, "");
     token = token.replace(/(@@)/g, "@");
